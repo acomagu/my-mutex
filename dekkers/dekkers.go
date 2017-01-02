@@ -11,7 +11,6 @@ func main() {
 	turn := 0
 
 	go func() {
-		fmt.Println("f0")
 		f0 = true
 		for f1 == true {
 			if turn != 0 {
@@ -22,15 +21,17 @@ func main() {
 			}
 		}
 
-		fmt.Println("a")
-		time.Sleep(1 * time.Second)
+		fmt.Println("I have a Pen.")
+		fmt.Println("I have an Apple.")
+		fmt.Println("Ah!")
+		fmt.Println("Apple-Pen!")
+		fmt.Println()
 
 		turn = 1
 		f0 = false
 	}()
 
 	go func() {
-		fmt.Println("f1")
 		f1 = true
 		for f0 == true {
 			if turn != 1 {
@@ -41,13 +42,21 @@ func main() {
 			}
 		}
 
-		fmt.Println("b")
-		time.Sleep(1 * time.Second)
+		fmt.Println("I have a Pen")
+		fmt.Println("I have a Pineapple")
+		fmt.Println("Ah!")
+		fmt.Println("Pineapple-Pen!")
+		fmt.Println()
 
 		turn = 0
 		f1 = false
 	}()
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(100 * time.Millisecond)
+
+	fmt.Println("Apple-Pen,")
+	fmt.Println("Pineapple-Pen,")
+	fmt.Println("Ah!")
+	fmt.Println("Pen-Pineapple-Apple-Pen!")
 
 }
