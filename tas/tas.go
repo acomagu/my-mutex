@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 func testAndSet(lock *int32, v int32) (initial int32)
@@ -18,30 +17,38 @@ func unlock() {
 	locked = 0
 }
 
+var k = 0
+
+func kanesawa() {
+	k++
+}
+
+func ito() {
+	k++
+}
+
 func main() {
-	go func() {
-		lock()
-
-		fmt.Println("I have a Pen.")
-		fmt.Println("I have an Apple.")
-		fmt.Println("Ah!")
-		fmt.Println("Apple-Pen!")
-		fmt.Println()
-
-		unlock()
-	}()
+	wait := make(chan bool)
 
 	go func() {
-		lock()
-
-		fmt.Println("I have a Pen")
-		fmt.Println("I have a Pineapple")
-		fmt.Println("Ah!")
-		fmt.Println("Pineapple-Pen!")
-		fmt.Println()
-
-		unlock()
+		for i := 0; i < 100000; i++ {
+			lock()
+			kanesawa()
+			unlock()
+		}
+		wait <- true
+	}()
+	go func() {
+		for i := 0; i < 100000; i++ {
+			lock()
+			ito()
+			unlock()
+		}
+		wait <- true
 	}()
 
-	time.Sleep(100 * time.Millisecond)
+	<-wait
+	<-wait
+
+	fmt.Println(k)
 }

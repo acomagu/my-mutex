@@ -2,61 +2,62 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
+var flags = make([]bool, 2)
+var turn = 0
+
+func lock(id int) {
+	revid := id ^ 1
+	flags[id] = true
+	for flags[revid] == true {
+		if turn != id {
+			flags[id] = false
+			for turn != id {
+			}
+			flags[id] = true
+		}
+	}
+}
+
+func unlock(id int) {
+	revid := id ^ 1
+	turn = revid
+	flags[id] = false
+}
+
+var k = 0
+
+func kanesawa() {
+	k++
+}
+
+func ito() {
+	k++
+}
+
 func main() {
-	f0 := false
-	f1 := false
-	turn := 0
+	wait := make(chan bool)
 
 	go func() {
-		f0 = true
-		for f1 == true {
-			if turn != 0 {
-				f0 = false
-				for turn != 0 {
-				}
-				f0 = true
-			}
+		for i := 0; i < 10000; i++ {
+			lock(0)
+			kanesawa()
+			unlock(0)
 		}
-
-		fmt.Println("I have a Pen.")
-		fmt.Println("I have an Apple.")
-		fmt.Println("Ah!")
-		fmt.Println("Apple-Pen!")
-		fmt.Println()
-
-		turn = 1
-		f0 = false
+		wait <- true
 	}()
-
 	go func() {
-		f1 = true
-		for f0 == true {
-			if turn != 1 {
-				f1 = false
-				for turn != 1 {
-				}
-				f1 = true
-			}
+		for i := 0; i < 10000; i++ {
+			lock(1)
+			ito()
+			unlock(1)
 		}
-
-		fmt.Println("I have a Pen")
-		fmt.Println("I have a Pineapple")
-		fmt.Println("Ah!")
-		fmt.Println("Pineapple-Pen!")
-		fmt.Println()
-
-		turn = 0
-		f1 = false
+		wait <- true
 	}()
 
-	time.Sleep(100 * time.Millisecond)
+	<-wait
+	<-wait
 
-	fmt.Println("Apple-Pen,")
-	fmt.Println("Pineapple-Pen,")
-	fmt.Println("Ah!")
-	fmt.Println("Pen-Pineapple-Apple-Pen!")
-
+	fmt.Println(k)
 }
